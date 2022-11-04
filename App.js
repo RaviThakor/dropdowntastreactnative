@@ -1,74 +1,59 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
-import CDropdown from './src/components/cdropdown';
-
-const defaultOptions = ['Apple', 'Burger', 'Juice', 'Frankie', 'Soup'];
+import React, {useState} from 'react';
+import {FlatList, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {styles} from './styles.js';
 
 const App = () => {
-  const [mondayValue, setMondayValue] = useState('');
-  const [tuesdayValue, setTuesdayValue] = useState('');
-  const [wednesdayValue, setWednesdayValue] = useState('');
+  const [value, setValue] = useState('');
 
-  const [options, setOptions] = useState(defaultOptions);
+  const [placeList, setPlaceList] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  useEffect(() => {
-    if (mondayValue || tuesdayValue || wednesdayValue) {
-      const filteredArray = defaultOptions.filter(
-        item =>
-          !(
-            item === mondayValue ||
-            item === tuesdayValue ||
-            item === wednesdayValue
-          ),
-      );
-      console.log(filteredArray);
-      setOptions([...filteredArray]);
+  const onRenderItemCloseButtonPress = index => {
+    placeList.splice(index, 1);
+    setPlaceList([...placeList]);
+  };
+
+  const renderItem = ({item, index}) => {
+    return (
+      <View style={styles.renderItem}>
+        <Text>{item.name}</Text>
+        <TouchableOpacity
+          onPress={() => onRenderItemCloseButtonPress(index)}
+          style={styles.closeButton}>
+          <Text>X</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const onAddItemButtonPress = () => {
+    if (value) {
+      setPlaceList([...placeList, {name: value}]);
+      setErrorMessage('');
+    } else {
+      setErrorMessage('please type some text...');
     }
-  }, [mondayValue, tuesdayValue, wednesdayValue]);
+  };
 
   return (
     <View style={styles.mainContainer}>
-      <CDropdown
-        label="Monday"
-        className="DropdownStyle"
-        data={options}
-        value={mondayValue}
-        placeholder="Select an option"
-        onSelect={selectedItem => {
-          setMondayValue(selectedItem);
-        }}
-      />
-      <CDropdown
-        label="Tuesday"
-        className="DropdownStyle"
-        data={options}
-        value={tuesdayValue}
-        onSelect={selectedItem => {
-          setTuesdayValue(selectedItem);
-        }}
-        placeholder="Select an option"
-      />
-      <CDropdown
-        label="Wednesday"
-        className="DropdownStyle"
-        data={options}
-        value={wednesdayValue}
-        onSelect={selectedItem => {
-          setWednesdayValue(selectedItem);
-        }}
-        placeholder="Select an option"
-      />
+      <View style={styles.addBox}>
+        <TextInput
+          style={styles.textInput}
+          onChangeText={val => setValue(val)}
+          value={value}
+          placeholder="Type Something..."
+        />
+        <TouchableOpacity
+          onPress={onAddItemButtonPress}
+          style={styles.addButton}>
+          <Text>Add Item</Text>
+        </TouchableOpacity>
+      </View>
+      {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+      <FlatList data={placeList} renderItem={renderItem} />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  mainContainer: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 export default App;
