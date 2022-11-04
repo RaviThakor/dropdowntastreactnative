@@ -14,6 +14,8 @@ describe('dropdown component', () => {
   it('renders dropdown if it has Monday text', () => {
     const screen = render(<CDropdown label="Monday" />);
 
-    expect(screen.getByText('Monday'));
+    const labelText = screen.getByText('Monday');
+
+    expect(labelText).not.toBeNull();
   });
 });
